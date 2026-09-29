@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Live Voice Agent</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #090b10;
+            --card-bg: rgba(18, 22, 33, 0.75);
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #4f8cf6;
+            --primary-glow: rgba(79, 140, 246, 0.35);
+            --text-main: #f0f3f8;
+            --text-muted: #8e9bb0;
+            --accent: #a855f7;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(168, 85, 247, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(79, 140, 246, 0.15) 0%, transparent 40%);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: var(--card-bg);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 40px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            margin: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        .title-group h1 {
+            font-size: 26px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .title-group p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #64748b;
+            transition: all 0.3s ease;
+        }
+
+        .status-dot.active {
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        .status-dot.speaking {
+            background: var(--primary);
+            box-shadow: 0 0 12px var(--primary);
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(0.8); opacity: 0.6; }
+            to { transform: scale(1.3); opacity: 1; }
+        }
+
+        .visualizer-container {
+            width: 100%;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .chat-container {
+            height: 280px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            padding-right: 8px;
+        }
+
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .message {
+            max-width: 82%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            font-size: 15px;
+            line-height: 1.5;
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.gemini {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border);
+            color: #e2e8f0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .btn-talk {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            border: none;
+            padding: 16px 36px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px var(--primary-glow);
+        }
+
+        .btn-talk:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 32px var(--primary-glow);
+        }
+
+        .btn-talk.active {
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
+        }
+
+        .pill-hint {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="title-group">
+            <h1>Gemini Live Voice Agent</h1>
+            <p>Full-Duplex Native Speech-to-Speech over WebSockets</p>
+        </div>
+        <div class="status-badge">
+            <div id="statusDot" class="status-dot"></div>
+            <span id="statusText">Disconnected</span>
+        </div>
+    </header>
+
+    <div class="visualizer-container">
+        <canvas id="visualizerCanvas"></canvas>
+    </div>
+
+    <div class="chat-container" id="chatContainer">
+        <div class="message gemini">
+            👋 Hello! Click "Start Voice Chat" to start talking with Gemini in real time.
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="talkBtn" class="btn-talk">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+            <span id="btnLabel">Start Voice Chat</span>
+        </button>
+    </div>
+
+    <p class="pill-hint">✨ Tip: You can interrupt Gemini naturally at any point just by speaking.</p>
+</div>
+
+<script>
+    const talkBtn = document.getElementById("talkBtn");
+    const btnLabel = document.getElementById("btnLabel");
+    const statusDot = document.getElementById("statusDot");
+    const statusText = document.getElementById("statusText");
+    const chatContainer = document.getElementById("chatContainer");
+    const canvas = document.getElementById("visualizerCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let isConnected = false;
+    let ws = null;
+    let audioContext = null;
+    let micStream = null;
+    let processorNode = null;
+    let currentSource = null;
+    let scheduledAudioTime = 0;
+
+    // Canvas sizing
+    function resizeCanvas() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    // Visualizer loop
+    function drawVisualizer() {
+        requestAnimationFrame(drawVisualizer);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = isConnected ? "#4f8cf6" : "#334155";
+        ctx.beginPath();
+
+        const sliceWidth = canvas.width / 50;
+        let x = 0;
+        for (let i = 0; i < 50; i++) {
+            const v = isConnected ? (Math.sin(Date.now() / 200 + i) * 15 + Math.random() * 8) : 0;
+            const y = canvas.height / 2 + v;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+            x += sliceWidth;
+        }
+        ctx.stroke();
+    }
+    drawVisualizer();
+
+    function appendMessage(sender, text) {
+        const msgDiv = document.createElement("div");
+        msgDiv.className = `message ${sender}`;
+        msgDiv.textContent = (sender === "user" ? "You: " : "Gemini: ") + text;
+        chatContainer.appendChild(msgDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    async function startSession() {
+        statusDot.className = "status-dot";
+        statusText.textContent = "Connecting...";
+
+        audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+        scheduledAudioTime = audioContext.currentTime;
+
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        ws = new WebSocket(`${protocol}//${window.location.host}/ws/voice`);
+        ws.binaryType = "arraybuffer";
+
+        ws.onopen = async () => {
+            isConnected = true;
+            statusDot.className = "status-dot active";
+            statusText.textContent = "Listening...";
+            talkBtn.classList.add("active");
+            btnLabel.textContent = "End Voice Chat";
+
+            await startMicrophone();
+        };
+
+        ws.onmessage = async (event) => {
+            if (typeof event.data === "string") {
+                const data = JSON.parse(event.data);
+                if (data.type === "user_transcript") {
+                    appendMessage("user", data.text);
+                } else if (data.type === "agent_transcript") {
+                    appendMessage("gemini", data.text);
+                } else if (data.type === "interrupted") {
+                    // Flush scheduled playback
+                    scheduledAudioTime = audioContext.currentTime;
+                    statusDot.className = "status-dot active";
+                    statusText.textContent = "Listening...";
+                }
+            } else {
+                // Incoming 24kHz PCM audio binary
+                statusDot.className = "status-dot speaking";
+                statusText.textContent = "Gemini Speaking...";
+                playAudioChunk(new Int16Array(event.data));
+            }
+        };
+
+        ws.onclose = () => {
+            stopSession();
+        };
+    }
+
+    async function startMicrophone() {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 16000, channelCount: 1 } });
+        const micContext = new AudioContext({ sampleRate: 16000 });
+        const source = micContext.createMediaStreamSource(micStream);
+        
+        // 1024 sample buffer (PCM 16-bit mono)
+        processorNode = micContext.createScriptProcessor(2048, 1, 1);
+        source.connect(processorNode);
+        processorNode.connect(micContext.destination);
+
+        processorNode.onaudioprocess = (e) => {
+            if (!isConnected || ws.readyState !== WebSocket.OPEN) return;
+            const inputData = e.inputBuffer.getChannelData(0);
+            const pcm16 = new Int16Array(inputData.length);
+            for (let i = 0; i < inputData.length; i++) {
+                const s = Math.max(-1, Math.min(1, inputData[i]));
+                pcm16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+            }
+            ws.send(pcm16.buffer);
+        };
+    }
+
+    function playAudioChunk(int16Array) {
+        const float32 = new Float32Array(int16Array.length);
+        for (let i = 0; i < int16Array.length; i++) {
+            float32[i] = int16Array[i] / 32768.0;
+        }
+
+        const buffer = audioContext.createBuffer(1, float32.length, 24000);
+        buffer.getChannelData(0).set(float32);
+
+        const source = audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(audioContext.destination);
+
+        const startTime = Math.max(scheduledAudioTime, audioContext.currentTime);
+        source.start(startTime);
+        scheduledAudioTime = startTime + buffer.duration;
+    }
+
+    function stopSession() {
+        isConnected = false;
+        if (ws) {
+            ws.close();
+            ws = null;
+        }
+        if (micStream) {
+            micStream.getTracks().forEach(t => t.stop());
+            micStream = null;
+        }
+        if (audioContext) {
+            audioContext.close();
+            audioContext = null;
+        }
+        statusDot.className = "status-dot";
+        statusText.textContent = "Disconnected";
+        talkBtn.classList.remove("active");
+        btnLabel.textContent = "Start Voice Chat";
+    }
+
+    talkBtn.addEventListener("click", () => {
+        if (isConnected) stopSession();
+        else startSession();
+    });
+</script>
+
+</body>
+</html>
