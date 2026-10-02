@@ -3,22 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Live Voice Agent</title>
+    <title>Gemini Live Multimodal Voice & Vision Agent</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #090b10;
-            --card-bg: rgba(18, 22, 33, 0.75);
-            --border: rgba(255, 255, 255, 0.08);
+            --bg: #090b12;
+            --card-bg: rgba(18, 22, 34, 0.92);
+            --border: rgba(255, 255, 255, 0.1);
+            --border-hover: rgba(255, 255, 255, 0.22);
             --primary: #4f8cf6;
             --primary-glow: rgba(79, 140, 246, 0.35);
+            --accent: #a855f7;
+            --accent-glow: rgba(168, 85, 247, 0.35);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
             --text-main: #f0f3f8;
             --text-muted: #8e9bb0;
-            --accent: #a855f7;
-            --success: #10b981;
-            --danger: #ef4444;
         }
 
         * {
@@ -36,25 +39,24 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow-x: hidden;
+            padding: 24px 16px;
             background-image: 
-                radial-gradient(circle at 20% 20%, rgba(168, 85, 247, 0.12) 0%, transparent 40%),
-                radial-gradient(circle at 80% 80%, rgba(79, 140, 246, 0.15) 0%, transparent 40%);
+                radial-gradient(circle at 10% 15%, rgba(168, 85, 247, 0.18) 0%, transparent 45%),
+                radial-gradient(circle at 90% 85%, rgba(79, 140, 246, 0.18) 0%, transparent 45%);
         }
 
         .container {
-            width: 90%;
-            max-width: 800px;
+            width: 100%;
+            max-width: 900px;
             background: var(--card-bg);
-            backdrop-filter: blur(24px);
+            backdrop-filter: blur(28px);
             border: 1px solid var(--border);
             border-radius: 28px;
-            padding: 40px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            padding: 28px;
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.65);
             display: flex;
             flex-direction: column;
-            gap: 28px;
-            margin: 20px;
+            gap: 20px;
         }
 
         header {
@@ -62,21 +64,36 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border);
-            padding-bottom: 20px;
+            padding-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
         .title-group h1 {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 700;
-            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, #c084fc 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .title-group p {
             color: var(--text-muted);
-            font-size: 14px;
+            font-size: 13px;
             margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-tag {
+            background: rgba(168, 85, 247, 0.18);
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            color: #d8b4fe;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
         }
 
         .status-badge {
@@ -92,8 +109,8 @@
         }
 
         .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 9px;
+            height: 9px;
             border-radius: 50%;
             background: #64748b;
             transition: all 0.3s ease;
@@ -106,57 +123,173 @@
 
         .status-dot.speaking {
             background: var(--primary);
-            box-shadow: 0 0 12px var(--primary);
+            box-shadow: 0 0 14px var(--primary);
             animation: pulse 1s infinite alternate;
+        }
+
+        .status-dot.thinking {
+            background: var(--warning);
+            box-shadow: 0 0 12px var(--warning);
+            animation: pulse 0.7s infinite alternate;
         }
 
         @keyframes pulse {
             from { transform: scale(0.8); opacity: 0.6; }
-            to { transform: scale(1.3); opacity: 1; }
+            to { transform: scale(1.4); opacity: 1; }
+        }
+
+        /* Nav Tabs */
+        .tabs-nav {
+            display: flex;
+            gap: 10px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .tab-btn.active {
+            color: #fff;
+            background: linear-gradient(135deg, rgba(79, 140, 246, 0.2), rgba(168, 85, 247, 0.2));
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        /* Visualizer and Camera Grid - Full Uncropped View */
+        .stage-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .stage-grid.with-camera {
+            grid-template-columns: 1fr 1fr;
         }
 
         .visualizer-container {
             width: 100%;
-            height: 120px;
-            background: rgba(0, 0, 0, 0.35);
+            height: 280px;
+            background: rgba(0, 0, 0, 0.4);
             border: 1px solid var(--border);
             border-radius: 20px;
+            position: relative;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            overflow: hidden;
         }
 
-        canvas {
+        canvas#visualizerCanvas {
             width: 100%;
             height: 100%;
         }
 
-        .chat-container {
+        .camera-container {
+            display: none;
+            position: relative;
+            background: #06080e;
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            border-radius: 20px;
+            overflow: hidden;
             height: 280px;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .camera-container.visible {
+            display: flex;
+        }
+
+        video#webcamVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Completely shows user's full face, head, and upper body */
+            background: #000;
+            transform: scaleX(-1);
+        }
+
+        .camera-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #10b981;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            z-index: 2;
+        }
+
+        .camera-dot {
+            width: 7px;
+            height: 7px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 1s infinite alternate;
+        }
+
+        /* Chat Feed */
+        .chat-container {
+            height: 220px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            padding-right: 8px;
+            gap: 12px;
+            padding-right: 6px;
         }
 
         .chat-container::-webkit-scrollbar {
-            width: 6px;
+            width: 5px;
         }
         .chat-container::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.12);
             border-radius: 4px;
         }
 
         .message {
-            max-width: 82%;
+            max-width: 85%;
             padding: 12px 18px;
             border-radius: 18px;
-            font-size: 15px;
+            font-size: 14.5px;
             line-height: 1.5;
             animation: fadeIn 0.25s ease-out;
+            word-wrap: break-word;
         }
 
         @keyframes fadeIn {
@@ -173,16 +306,286 @@
 
         .message.gemini {
             align-self: flex-start;
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.07);
             border: 1px solid var(--border);
             color: #e2e8f0;
             border-bottom-left-radius: 4px;
         }
 
-        .controls {
-            display: flex;
-            justify-content: center;
+        .message.system {
+            align-self: center;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px dashed var(--border);
+            color: var(--text-muted);
+            font-size: 12.5px;
+            border-radius: 12px;
+            padding: 6px 14px;
+        }
+
+        .message-img {
+            max-width: 200px;
+            max-height: 150px;
+            border-radius: 10px;
+            margin-top: 8px;
+            border: 1px solid var(--border);
+            display: block;
+        }
+
+                /* History Tab Layout */
+        .history-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
             gap: 16px;
+            min-height: 420px;
+            max-height: 520px;
+        }
+
+        .session-list-panel {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+        }
+
+        .session-item {
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .session-item:hover {
+            background: rgba(79, 140, 246, 0.1);
+            border-color: rgba(79, 140, 246, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .session-item.active {
+            background: rgba(168, 85, 247, 0.15);
+            border-color: #a855f7;
+        }
+
+        .session-item-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .session-item-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .session-detail-panel {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .detail-messages {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 6px;
+        }
+
+        .empty-history {
+            text-align: center;
+            color: var(--text-muted);
+            margin: auto;
+            font-size: 14px;
+        }
+
+        /* Token Counter Badge */
+        .token-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            background: rgba(79, 140, 246, 0.12);
+            border: 1px solid rgba(79, 140, 246, 0.28);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #93c5fd;
+        }
+
+        /* Interim Speech Bubble (Live ASR typing) */
+        .message.user.interim {
+            opacity: 0.72;
+            font-style: italic;
+            background: rgba(59, 130, 246, 0.45);
+            border: 1px dashed rgba(255, 255, 255, 0.25);
+            animation: pulseSubtle 1.2s infinite alternate;
+        }
+
+        @keyframes pulseSubtle {
+            from { opacity: 0.55; }
+            to { opacity: 0.85; }
+        }
+
+        /* Grounding / Search Sources */
+        .grounding-sources {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .source-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border);
+            padding: 3px 9px;
+            border-radius: 10px;
+            font-size: 11px;
+            color: #93c5fd;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .source-pill:hover {
+            background: rgba(79, 140, 246, 0.25);
+            border-color: #60a5fa;
+            color: #fff;
+        }
+
+        
+        
+        .session-images-gallery {
+            padding: 12px 16px;
+            background: rgba(15, 23, 42, 0.65);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .gallery-header {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .gallery-strip {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        .gallery-item {
+            position: relative;
+            flex-shrink: 0;
+            width: 140px;
+            height: 95px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            background: #0f172a;
+        }
+        .gallery-item:hover {
+            transform: scale(1.04);
+            border-color: #38bdf8;
+            box-shadow: 0 4px 16px rgba(56, 189, 248, 0.3);
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .gallery-badge {
+            position: absolute;
+            bottom: 4px;
+            left: 4px;
+            background: rgba(0, 0, 0, 0.75);
+            color: #f1f5f9;
+            font-size: 9.5px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            backdrop-filter: blur(4px);
+        }
+
+        .history-msg-img {
+            max-width: 260px;
+            max-height: 180px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: block;
+            margin-top: 8px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+        }
+
+        .history-msg-img:hover {
+            transform: scale(1.03);
+            border-color: #60a5fa;
+            box-shadow: 0 8px 24px rgba(96, 165, 250, 0.35);
+        }
+    
+        /* Controls */
+        .controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 13px 20px;
+            border-radius: 24px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .btn-action:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--border-hover);
+            transform: translateY(-1px);
         }
 
         .btn-talk {
@@ -192,9 +595,9 @@
             background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
             color: white;
             border: none;
-            padding: 16px 36px;
+            padding: 15px 36px;
             border-radius: 30px;
-            font-size: 16px;
+            font-size: 15.5px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -211,10 +614,121 @@
             box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
         }
 
-        .pill-hint {
-            text-align: center;
-            font-size: 13px;
+        .btn-camera.active {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: #10b981;
+            color: #6ee7b7;
+        }
+
+        .hint {
+            font-size: 12.5px;
             color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* Card Panels for OCR & Gen */
+        .card-panel {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .upload-dropzone {
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 26px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: rgba(255, 255, 255, 0.02);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .upload-dropzone:hover {
+            border-color: var(--primary);
+            background: rgba(79, 140, 246, 0.05);
+        }
+
+        .dropzone-preview {
+            max-width: 240px;
+            max-height: 180px;
+            border-radius: 12px;
+            object-fit: cover;
+            display: none;
+            border: 1px solid var(--border);
+        }
+
+        .input-text {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-text:focus {
+            border-color: var(--primary);
+        }
+
+        .result-box {
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            color: #e2e8f0;
+            max-height: 220px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .gen-preview-container {
+            min-height: 180px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .gen-image-result {
+            max-width: 100%;
+            max-height: 380px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+            display: none;
+        }
+
+        .info-callout {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            border-radius: 12px;
+            padding: 14px 18px;
+            font-size: 13.5px;
+            color: #fbbf24;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
         }
     </style>
 </head>
@@ -223,125 +737,428 @@
 <div class="container">
     <header>
         <div class="title-group">
-            <h1>Gemini Live Voice Agent</h1>
-            <p>Full-Duplex Native Speech-to-Speech over WebSockets</p>
+            <h1>Gemini Live Voice & Vision Agent</h1>
+            <p>Real-Time Multimodal Voice, Continuous Camera Video, OCR & Image Gen <span class="badge-tag">gemini-3.1-flash</span></p>
         </div>
-        <div class="status-badge">
-            <div id="statusDot" class="status-dot"></div>
-            <span id="statusText">Disconnected</span>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div id="tokenBadge" class="token-badge" style="display:none;" title="Real-time session token consumption">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="6" x2="12" y2="12"/><line x1="12" y1="12" x2="16" y2="14"/></svg>
+                <span id="tokenText">0 tokens</span>
+            </div>
+            <div class="status-badge">
+                <div id="statusDot" class="status-dot"></div>
+                <span id="statusText">Ready</span>
+            </div>
         </div>
     </header>
 
-    <div class="visualizer-container">
-        <canvas id="visualizerCanvas"></canvas>
-    </div>
-
-    <div class="chat-container" id="chatContainer">
-        <div class="message gemini">
-            👋 Hello! Click "Start Voice Chat" to start talking with Gemini in real time.
-        </div>
-    </div>
-
-    <div class="controls">
-        <button id="talkBtn" class="btn-talk">
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
-            <span id="btnLabel">Start Voice Chat</span>
+    <!-- Navigation Tabs -->
+    <div class="tabs-nav">
+        <button id="tabBtnLive" class="tab-btn active" onclick="switchTab('live')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            Live Voice & Camera
+        </button>
+        <button id="tabBtnOcr" class="tab-btn" onclick="switchTab('ocr')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Image OCR & Analysis
+        </button>
+        <button id="tabBtnGen" class="tab-btn" onclick="switchTab('gen')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            AI Image Generator
+        </button>
+        <button id="tabBtnHistory" class="tab-btn" onclick="switchTab('history')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Past Conversations
         </button>
     </div>
 
-    <p class="pill-hint">✨ Tip: You can interrupt Gemini naturally at any point just by speaking.</p>
+    <!-- TAB 1: Live Voice & Camera -->
+    <div id="tabLive" class="tab-content active">
+        <div id="stageGrid" class="stage-grid">
+            <div class="visualizer-container">
+                <canvas id="visualizerCanvas"></canvas>
+            </div>
+            <div id="cameraContainer" class="camera-container">
+                <video id="webcamVideo" autoplay playsinline muted></video>
+                <div class="camera-badge">
+                    <span class="camera-dot"></span> Live Video Stream
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="message gemini">
+                👋 Click <b>"Start Voice Chat"</b> to speak with Gemini. Turn on your <b>Camera</b> and ask: <i>"Can you see me?"</i> or <i>"What am I holding?"</i>
+            </div>
+        </div>
+
+        <div class="controls-row">
+            <button id="talkBtn" class="btn-talk">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                <span id="btnLabel">Start Voice Chat</span>
+            </button>
+
+            <button id="cameraBtn" class="btn-action btn-camera" onclick="toggleCamera()">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                <span id="cameraLabel">Turn On Camera</span>
+            </button>
+
+            <button id="inspectBtn" class="btn-action" onclick="inspectCurrentCameraFrame()" title="Take an instant HD snapshot of your camera feed and ask Gemini to inspect it in detail">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="2" y1="12" x2="4" y2="12"/></svg>
+                <span>Inspect Current View</span>
+            </button>
+
+            <label class="btn-action" style="cursor:pointer;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span>Upload Image</span>
+                <input type="file" id="liveImageUpload" accept="image/*" style="display:none;" onchange="handleLiveImageUpload(event)">
+            </label>
+        </div>
+        <p class="hint">⚡ Speak naturally while showing your camera. Gemini Live watches your video frames and talks back in real time.</p>
+    </div>
+
+    <!-- TAB 2: Image OCR & Deep Analysis -->
+    <div id="tabOcr" class="tab-content">
+        <div class="card-panel">
+            <div class="upload-dropzone" onclick="document.getElementById('staticImageUpload').click()">
+                <img id="staticPreview" class="dropzone-preview" alt="Preview">
+                <div id="dropzonePlaceholder">
+                    <svg width="36" height="36" fill="none" stroke="var(--primary)" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <p style="font-weight: 600; margin-top: 6px;">Click to choose an image (receipt, document, sign, photo)</p>
+                    <p style="font-size: 12px; color: var(--text-muted);">Supports JPG, PNG, WebP</p>
+                </div>
+                <input type="file" id="staticImageUpload" accept="image/*" style="display:none;" onchange="handleStaticImagePick(event)">
+            </div>
+
+            <input type="text" id="qaQuestion" class="input-text" placeholder="Optional: Ask a question about this image">
+
+            <div class="controls-row">
+                <button class="btn-action" onclick="processStaticImage('ocr')">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+                    Extract Text (OCR)
+                </button>
+                <button class="btn-action" onclick="processStaticImage('describe')">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    Deep Visual Analysis
+                </button>
+                <button class="btn-action" onclick="processStaticImage('qa')">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    Answer Question
+                </button>
+            </div>
+
+            <div id="ocrResultBox" class="result-box"></div>
+        </div>
+    </div>
+
+    <!-- TAB 3: AI Image Generator -->
+    <div id="tabGen" class="tab-content">
+        <div class="card-panel">
+            <p style="font-size: 14px; color: var(--text-muted);">Generate images and digital illustrations using Gemini and Imagen multimodal models.</p>
+            
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="genPrompt" class="input-text" placeholder="Describe the image (e.g. A neon cybernetic cat playing guitar on Mars)">
+                <button class="btn-talk" style="padding: 12px 26px; white-space: nowrap;" onclick="triggerImageGeneration()">
+                    <span>Generate</span>
+                </button>
+            </div>
+
+            <div class="gen-preview-container" id="genContainer">
+                <p id="genStatusText" style="color: var(--text-muted); font-size: 13.5px;">Enter a prompt above and click Generate.</p>
+                <img id="genResultImg" class="gen-image-result" alt="Generated Image">
+            </div>
+
+            <div class="info-callout">
+                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <div>
+                    <b>Gemini API Notice:</b> Image generation models require a billing-linked project in Google AI Studio. Real-time voice conversation, continuous camera video streaming, and document OCR are fully active and free.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 4: Past Conversations (Kafka & PostgreSQL) -->
+    <div id="tabHistory" class="tab-content">
+        <div class="history-container">
+            <div class="session-list-panel">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                    <span style="font-size:13px; font-weight:600; color:#cbd5e1;">Sessions</span>
+                    <button class="btn-action" style="padding:4px 8px; font-size:11px;" onclick="loadHistorySessions()">🔄 Refresh</button>
+                </div>
+                <div id="sessionListItems" style="display:flex; flex-direction:column; gap:8px;">
+                    <div class="empty-history">Loading sessions...</div>
+                </div>
+            </div>
+
+            <div class="session-detail-panel">
+                <div class="detail-header">
+                    <div>
+                        <h3 id="detailTitle" style="font-size:15px; font-weight:700;">Select a Conversation</h3>
+                        <p id="detailSubtitle" style="font-size:12px; color:var(--text-muted);">Stored via Apache Kafka & PostgreSQL</p>
+                    </div>
+                    <div id="exportBtnGroup" style="display:none; gap:8px;">
+                        <button class="btn-action" style="padding:6px 12px; font-size:12px;" onclick="exportCurrentSession('markdown')">📥 Export MD</button>
+                        <button class="btn-action" style="padding:6px 12px; font-size:12px;" onclick="exportCurrentSession('json')">📥 Export JSON</button>
+                    </div>
+                </div>
+                <div id="sessionImagesGallery" class="session-images-gallery" style="display:none;"></div>
+                <div id="detailMessages" class="detail-messages">
+                    <div class="empty-history">Select a conversation from the left to view transcripts & timestamps.</div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
+<canvas id="captureCanvas" style="display:none;"></canvas>
+
 <script>
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        if (tab === 'live') {
+            document.getElementById('tabBtnLive').classList.add('active');
+            document.getElementById('tabLive').classList.add('active');
+        } else if (tab === 'ocr') {
+            document.getElementById('tabBtnOcr').classList.add('active');
+            document.getElementById('tabOcr').classList.add('active');
+        } else if (tab === 'gen') {
+            document.getElementById('tabBtnGen').classList.add('active');
+            document.getElementById('tabGen').classList.add('active');
+        } else if (tab === 'history') {
+            document.getElementById('tabBtnHistory').classList.add('active');
+            document.getElementById('tabHistory').classList.add('active');
+            loadHistorySessions();
+        }
+    }
+
     const talkBtn = document.getElementById("talkBtn");
     const btnLabel = document.getElementById("btnLabel");
     const statusDot = document.getElementById("statusDot");
     const statusText = document.getElementById("statusText");
     const chatContainer = document.getElementById("chatContainer");
-    const canvas = document.getElementById("visualizerCanvas");
-    const ctx = canvas.getContext("2d");
+    const visualizerCanvas = document.getElementById("visualizerCanvas");
+    const vCtx = visualizerCanvas.getContext("2d");
 
     let isConnected = false;
     let ws = null;
-    let audioContext = null;
+    let playbackCtx = null;
+    let scheduledPlayTime = 0;
+    let micCtx = null;
     let micStream = null;
-    let processorNode = null;
-    let currentSource = null;
-    let scheduledAudioTime = 0;
+    let micVolume = 0;
+    let activeSources = [];
 
-    // Canvas sizing
+    let cameraStream = null;
+    let isCameraOn = false;
+    let cameraInterval = null;
+    const cameraContainer = document.getElementById("cameraContainer");
+    const stageGrid = document.getElementById("stageGrid");
+    const webcamVideo = document.getElementById("webcamVideo");
+    const cameraLabel = document.getElementById("cameraLabel");
+    const cameraBtn = document.getElementById("cameraBtn");
+    const captureCanvas = document.getElementById("captureCanvas");
+
     function resizeCanvas() {
-        canvas.width = canvas.parentElement.clientWidth;
-        canvas.height = canvas.parentElement.clientHeight;
+        visualizerCanvas.width = visualizerCanvas.parentElement.clientWidth;
+        visualizerCanvas.height = visualizerCanvas.parentElement.clientHeight;
     }
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
-    // Visualizer loop
     function drawVisualizer() {
         requestAnimationFrame(drawVisualizer);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = isConnected ? "#4f8cf6" : "#334155";
-        ctx.beginPath();
+        vCtx.clearRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
+        vCtx.lineWidth = 2.5;
+        vCtx.strokeStyle = isConnected ? (micVolume > 0.05 ? "#a855f7" : "#4f8cf6") : "#334155";
+        vCtx.beginPath();
 
-        const sliceWidth = canvas.width / 50;
+        const sliceWidth = visualizerCanvas.width / 40;
         let x = 0;
-        for (let i = 0; i < 50; i++) {
-            const v = isConnected ? (Math.sin(Date.now() / 200 + i) * 15 + Math.random() * 8) : 0;
-            const y = canvas.height / 2 + v;
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
+        for (let i = 0; i < 40; i++) {
+            const amp = isConnected ? (micVolume * 40 + Math.sin(Date.now() / 180 + i) * 6) : 0;
+            const y = visualizerCanvas.height / 2 + (i % 2 === 0 ? amp : -amp);
+            if (i === 0) vCtx.moveTo(x, y);
+            else vCtx.lineTo(x, y);
             x += sliceWidth;
         }
-        ctx.stroke();
+        vCtx.stroke();
     }
     drawVisualizer();
 
-    function appendMessage(sender, text) {
-        const msgDiv = document.createElement("div");
-        msgDiv.className = `message ${sender}`;
-        msgDiv.textContent = (sender === "user" ? "You: " : "Gemini: ") + text;
-        chatContainer.appendChild(msgDiv);
+        let interimEl = null;
+
+    function updateInterimBubble(text) {
+        if (!interimEl) {
+            interimEl = document.createElement("div");
+            interimEl.className = "message user interim";
+            chatContainer.appendChild(interimEl);
+        }
+        interimEl.textContent = "You: " + text + " …";
         chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function clearInterimBubble() {
+        if (interimEl) {
+            interimEl.remove();
+            interimEl = null;
+        }
+    }
+
+    function renderGroundingSources(data) {
+        if (!data || !data.sources || data.sources.length === 0) return;
+        const container = document.createElement("div");
+        container.className = "grounding-sources";
+        data.sources.forEach((src, idx) => {
+            const a = document.createElement("a");
+            a.className = "source-pill";
+            a.href = src.url || "#";
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            a.innerHTML = "🔍 " + (src.title || "Source " + (idx + 1));
+            container.appendChild(a);
+        });
+        chatContainer.appendChild(container);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+let lastSender = null;
+    let lastMsgEl = null;
+
+    function appendMessage(sender, text, imgUrl = null) {
+        const msgDiv = document.createElement("div");
+        msgDiv.className = "message " + sender;
+        let prefix = "";
+        if (sender === "user") prefix = "You: ";
+        else if (sender === "gemini") prefix = "Gemini: ";
+        msgDiv.textContent = prefix + text;
+        if (imgUrl) {
+            const img = document.createElement("img");
+            img.src = imgUrl;
+            img.className = "message-img";
+            msgDiv.appendChild(img);
+        }
+        if (lastSender === sender && !imgUrl && lastMsgEl && sender !== "system") {
+            lastMsgEl.textContent += text;
+        } else {
+            chatContainer.appendChild(msgDiv);
+            lastMsgEl = msgDiv;
+            lastSender = sender;
+        }
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function downsampleTo16k(buffer, sampleRate) {
+        if (sampleRate === 16000) return buffer;
+        const ratio = sampleRate / 16000;
+        const newLength = Math.round(buffer.length / ratio);
+        const result = new Float32Array(newLength);
+        let offsetResult = 0;
+        let offsetBuffer = 0;
+        while (offsetResult < result.length) {
+            const nextOffsetBuffer = Math.round((offsetResult + 1) * ratio);
+            let accum = 0, count = 0;
+            for (let i = offsetBuffer; i < nextOffsetBuffer && i < buffer.length; i++) {
+                accum += buffer[i];
+                count++;
+            }
+            result[offsetResult] = count > 0 ? accum / count : 0;
+            offsetResult++;
+            offsetBuffer = nextOffsetBuffer;
+        }
+        return result;
     }
 
     async function startSession() {
         statusDot.className = "status-dot";
         statusText.textContent = "Connecting...";
 
-        audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
-        scheduledAudioTime = audioContext.currentTime;
+        playbackCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (playbackCtx.state === "suspended") {
+            await playbackCtx.resume();
+        }
+        scheduledPlayTime = playbackCtx.currentTime;
 
         const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        ws = new WebSocket(`${protocol}//${window.location.host}/ws/voice`);
+        ws = new WebSocket(protocol + "//" + window.location.host + "/ws/voice");
         ws.binaryType = "arraybuffer";
 
         ws.onopen = async () => {
-            isConnected = true;
-            statusDot.className = "status-dot active";
-            statusText.textContent = "Listening...";
-            talkBtn.classList.add("active");
-            btnLabel.textContent = "End Voice Chat";
+            console.log("WebSocket opened. Starting mic capture...");
+            try {
+                await startMicrophone();
+                isConnected = true;
+                statusDot.className = "status-dot active";
+                statusText.textContent = "Listening...";
+                talkBtn.classList.add("active");
+                btnLabel.textContent = "End Voice Chat";
 
-            await startMicrophone();
+                if (isCameraOn) {
+                    startCameraStreaming();
+                }
+            } catch (err) {
+                console.error("Microphone capture failed:", err);
+                alert("Could not access microphone: " + err.message);
+                stopSession();
+            }
         };
 
-        ws.onmessage = async (event) => {
+        ws.onmessage = (event) => {
             if (typeof event.data === "string") {
                 const data = JSON.parse(event.data);
-                if (data.type === "user_transcript") {
-                    appendMessage("user", data.text);
+                if (data.type === "ready" || data.type === "setup_complete") {
+                    console.log("Gemini session handshake ready:", data.session_id || "ok");
+                } else if (data.type === "interim_transcript") {
+                    // Real-time live speech typing as user speaks
+                    updateInterimBubble(data.text);
+                } else if (data.type === "user_transcript") {
+                    // Confirmed speech transcript: clear interim and append permanent bubble
+                    clearInterimBubble();
+                    appendMessage("user", data.text, data.image_url || null);
+                    statusDot.className = "status-dot thinking";
+                    statusText.textContent = "Thinking...";
                 } else if (data.type === "agent_transcript") {
                     appendMessage("gemini", data.text);
+                } else if (data.type === "usage_metadata") {
+                    // Real-time token tracking
+                    const tokenBadge = document.getElementById("tokenBadge");
+                    const tokenText = document.getElementById("tokenText");
+                    if (tokenBadge && tokenText && data.data) {
+                        const total = data.data.total_tokens || 0;
+                        tokenText.textContent = total.toLocaleString() + " tokens";
+                        tokenBadge.style.display = "flex";
+                    }
+                } else if (data.type === "grounding_metadata") {
+                    // Search citations
+                    renderGroundingSources(data.data);
+                } else if (data.type === "go_away") {
+                    appendMessage("system", "⚠️ Session duration warning: " + (data.time_left || "expiring soon") + ". Session will auto-reconnect.");
                 } else if (data.type === "interrupted") {
-                    // Flush scheduled playback
-                    scheduledAudioTime = audioContext.currentTime;
+                    clearInterimBubble();
+                    activeSources.forEach(s => { try { s.stop(); } catch(e){} });
+                    activeSources = [];
+                    scheduledPlayTime = playbackCtx ? playbackCtx.currentTime : 0;
+                    lastSender = null;
+                    lastMsgEl = null;
                     statusDot.className = "status-dot active";
                     statusText.textContent = "Listening...";
+                } else if (data.type === "turn_complete") {
+                    clearInterimBubble();
+                    lastSender = null;
+                    lastMsgEl = null;
+                    if (activeSources.length === 0 && isConnected) {
+                        statusDot.className = "status-dot active";
+                        statusText.textContent = "Listening...";
+                    }
+                } else if (data.type === "session_error") {
+                    appendMessage("system", "⚠️ " + data.message);
+                    statusDot.className = "status-dot thinking";
+                    statusText.textContent = "Reconnecting...";
+                } else if (data.type === "error") {
+                    appendMessage("system", "Notice: " + data.message);
+                    statusText.textContent = "Error: " + data.message;
                 }
             } else {
-                // Incoming 24kHz PCM audio binary
                 statusDot.className = "status-dot speaking";
                 statusText.textContent = "Gemini Speaking...";
                 playAudioChunk(new Int16Array(event.data));
@@ -349,66 +1166,110 @@
         };
 
         ws.onclose = () => {
+            const wasActive = isConnected;
             stopSession();
+            if (wasActive) {
+                statusText.textContent = "Session ended. Click 'Start Voice Chat' to resume.";
+            }
         };
+        ws.onerror = (e) => { console.error("WebSocket error:", e); };
     }
 
-    async function startMicrophone() {
-        micStream = await navigator.mediaDevices.getUserMedia({ audio: { sampleRate: 16000, channelCount: 1 } });
-        const micContext = new AudioContext({ sampleRate: 16000 });
-        const source = micContext.createMediaStreamSource(micStream);
-        
-        // 1024 sample buffer (PCM 16-bit mono)
-        processorNode = micContext.createScriptProcessor(2048, 1, 1);
-        source.connect(processorNode);
-        processorNode.connect(micContext.destination);
+    let pcmSampleAccumulator = [];
 
-        processorNode.onaudioprocess = (e) => {
-            if (!isConnected || ws.readyState !== WebSocket.OPEN) return;
-            const inputData = e.inputBuffer.getChannelData(0);
-            const pcm16 = new Int16Array(inputData.length);
-            for (let i = 0; i < inputData.length; i++) {
-                const s = Math.max(-1, Math.min(1, inputData[i]));
-                pcm16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+    async function startMicrophone() {
+        micStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                channelCount: 1,
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true,
             }
-            ws.send(pcm16.buffer);
+        });
+
+        micCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (micCtx.state === "suspended") {
+            await micCtx.resume();
+        }
+
+        const source = micCtx.createMediaStreamSource(micStream);
+        const processor = micCtx.createScriptProcessor(1024, 1, 1);
+        window._persistentProcessor = processor;
+
+        const muteNode = micCtx.createGain();
+        muteNode.gain.value = 0;
+
+        source.connect(processor);
+        processor.connect(muteNode);
+        muteNode.connect(micCtx.destination);
+
+        pcmSampleAccumulator = [];
+
+        processor.onaudioprocess = (e) => {
+            if (!isConnected || !ws || ws.readyState !== WebSocket.OPEN) return;
+            if (micCtx.state === "suspended") micCtx.resume();
+            const inputData = e.inputBuffer.getChannelData(0);
+
+            let sum = 0;
+            for (let i = 0; i < inputData.length; i++) sum += inputData[i] * inputData[i];
+            micVolume = Math.sqrt(sum / inputData.length);
+
+            // Downsample to 16kHz
+            const downsampled = downsampleTo16k(inputData, micCtx.sampleRate);
+            for (let i = 0; i < downsampled.length; i++) {
+                const s = Math.max(-1, Math.min(1, downsampled[i]));
+                const val = s < 0 ? s * 0x8000 : s * 0x7FFF;
+                pcmSampleAccumulator.push(val);
+            }
+
+            // Buffer into 1600 samples (3200 bytes = 100ms) for smooth transmission
+            while (pcmSampleAccumulator.length >= 1600) {
+                const chunkSamples = pcmSampleAccumulator.splice(0, 1600);
+                const pcm16 = new Int16Array(chunkSamples);
+                ws.send(pcm16.buffer);
+            }
         };
     }
 
     function playAudioChunk(int16Array) {
+        if (!playbackCtx) return;
+        if (playbackCtx.state === "suspended") playbackCtx.resume();
         const float32 = new Float32Array(int16Array.length);
         for (let i = 0; i < int16Array.length; i++) {
             float32[i] = int16Array[i] / 32768.0;
         }
 
-        const buffer = audioContext.createBuffer(1, float32.length, 24000);
+        const buffer = playbackCtx.createBuffer(1, float32.length, 24000);
         buffer.getChannelData(0).set(float32);
 
-        const source = audioContext.createBufferSource();
+        const source = playbackCtx.createBufferSource();
         source.buffer = buffer;
-        source.connect(audioContext.destination);
-
-        const startTime = Math.max(scheduledAudioTime, audioContext.currentTime);
+        source.connect(playbackCtx.destination);
+        const startTime = Math.max(scheduledPlayTime, playbackCtx.currentTime);
         source.start(startTime);
-        scheduledAudioTime = startTime + buffer.duration;
+        scheduledPlayTime = startTime + buffer.duration;
+        activeSources.push(source);
+        source.onended = () => {
+            activeSources = activeSources.filter(s => s !== source);
+            if (activeSources.length === 0 && isConnected) {
+                statusDot.className = "status-dot active";
+                statusText.textContent = "Listening...";
+            }
+        };
     }
 
     function stopSession() {
         isConnected = false;
-        if (ws) {
-            ws.close();
-            ws = null;
-        }
-        if (micStream) {
-            micStream.getTracks().forEach(t => t.stop());
-            micStream = null;
-        }
-        if (audioContext) {
-            audioContext.close();
-            audioContext = null;
-        }
+        stopCameraStreaming();
+        pcmSampleAccumulator = [];
+        if (ws) { ws.close(); ws = null; }
+        if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+        if (micCtx) { micCtx.close(); micCtx = null; }
+        if (playbackCtx) { playbackCtx.close(); playbackCtx = null; }
+        window._persistentProcessor = null;
+
         statusDot.className = "status-dot";
-        statusText.textContent = "Disconnected";
+        statusText.textContent = "Ready";
         talkBtn.classList.remove("active");
         btnLabel.textContent = "Start Voice Chat";
     }
@@ -417,7 +1278,341 @@
         if (isConnected) stopSession();
         else startSession();
     });
-</script>
 
+    async function toggleCamera() {
+        if (isCameraOn) stopCamera();
+        else await startCamera();
+    }
+
+    async function startCamera() {
+        try {
+            cameraStream = await navigator.mediaDevices.getUserMedia({
+                video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" }
+            });
+            webcamVideo.srcObject = cameraStream;
+            cameraContainer.classList.add("visible");
+            stageGrid.classList.add("with-camera");
+            cameraBtn.classList.add("active");
+            cameraLabel.textContent = "Turn Off Camera";
+            isCameraOn = true;
+
+            if (isConnected && ws && ws.readyState === WebSocket.OPEN) {
+                startCameraStreaming();
+            }
+            appendMessage("system", "📷 Camera enabled. Live video is streaming to Gemini.");
+        } catch (err) {
+            console.error("Camera access failed:", err);
+            alert("Could not access camera: " + err.message);
+        }
+    }
+
+    function stopCamera() {
+        stopCameraStreaming();
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(t => t.stop());
+            cameraStream = null;
+        }
+        webcamVideo.srcObject = null;
+        cameraContainer.classList.remove("visible");
+        stageGrid.classList.remove("with-camera");
+        cameraBtn.classList.remove("active");
+        cameraLabel.textContent = "Turn On Camera";
+        isCameraOn = false;
+        appendMessage("system", "Camera turned off.");
+    }
+
+    function captureCurrentFrame(highRes = false) {
+        if (!isCameraOn || !webcamVideo.videoWidth) return null;
+        const w = webcamVideo.videoWidth;
+        const h = webcamVideo.videoHeight;
+        // Use lightweight 640x480 (0.72 quality) for continuous streaming (<30KB) to prevent 1011 gateway disconnects.
+        // Use 960x720 (0.88 quality) for explicit user inspection requests.
+        const maxW = highRes ? 960 : 640;
+        const maxH = highRes ? 720 : 480;
+        const quality = highRes ? 0.88 : 0.72;
+        const scale = Math.min(maxW / w, maxH / h, 1);
+        captureCanvas.width = Math.round(w * scale);
+        captureCanvas.height = Math.round(h * scale);
+        const cCtx = captureCanvas.getContext("2d");
+        cCtx.drawImage(webcamVideo, 0, 0, captureCanvas.width, captureCanvas.height);
+        return captureCanvas.toDataURL("image/jpeg", quality);
+    }
+
+    function startCameraStreaming() {
+        if (cameraInterval) clearInterval(cameraInterval);
+        // Stream 1 video frame every 1.8s (0.55 FPS, strictly compliant with Gemini Live < 1 FPS limit)
+        cameraInterval = setInterval(() => {
+            if (!isConnected || !ws || ws.readyState !== WebSocket.OPEN || !isCameraOn) return;
+            const dataUrl = captureCurrentFrame(false);
+            if (dataUrl) {
+                ws.send(JSON.stringify({
+                    type: "image",
+                    data: dataUrl,
+                    mime_type: "image/jpeg"
+                }));
+            }
+        }, 1800);
+    }
+
+    function stopCameraStreaming() {
+        if (cameraInterval) {
+            clearInterval(cameraInterval);
+            cameraInterval = null;
+        }
+    }
+
+    function inspectCurrentCameraFrame() {
+        if (!isCameraOn) {
+            alert("Please click 'Turn On Camera' first!");
+            return;
+        }
+        if (!isConnected || !ws || ws.readyState !== WebSocket.OPEN) {
+            alert("Please click 'Start Voice Chat' first so Gemini is active!");
+            return;
+        }
+        const dataUrl = captureCurrentFrame(true);
+        if (dataUrl) {
+            appendMessage("user", "Inspecting current camera view:", dataUrl);
+            statusDot.className = "status-dot thinking";
+            statusText.textContent = "Analyzing Vision...";
+            ws.send(JSON.stringify({
+                type: "image_ask",
+                data: dataUrl,
+                mime_type: "image/jpeg",
+                prompt: "Please examine what is shown in front of the camera (such as a phone screen, wallpaper, or object) and describe it in detail."
+            }));
+        }
+    }
+
+function handleLiveImageUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const dataUrl = event.target.result;
+            appendMessage("user", "Uploaded photo for discussion:", dataUrl);
+            if (!isConnected || !ws || ws.readyState !== WebSocket.OPEN) {
+                alert("Please click 'Start Voice Chat' first so Gemini is active!");
+                return;
+            }
+            statusDot.className = "status-dot thinking";
+            statusText.textContent = "Analyzing Vision...";
+            ws.send(JSON.stringify({
+                type: "image_ask",
+                data: dataUrl,
+                mime_type: file.type || "image/jpeg",
+                prompt: "Tell me what you see in this photo and what stands out."
+            }));
+        };
+        reader.readAsDataURL(file);
+        e.target.value = "";
+    }
+
+    let selectedStaticDataUrl = null;
+    let selectedStaticMime = "image/jpeg";
+
+    function handleStaticImagePick(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        selectedStaticMime = file.type || "image/jpeg";
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            selectedStaticDataUrl = event.target.result;
+            const img = document.getElementById("staticPreview");
+            img.src = selectedStaticDataUrl;
+            img.style.display = "block";
+            document.getElementById("dropzonePlaceholder").style.display = "none";
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function processStaticImage(mode) {
+        if (!selectedStaticDataUrl) {
+            alert("Please select an image first!");
+            return;
+        }
+        const resultBox = document.getElementById("ocrResultBox");
+        const questionInput = document.getElementById("qaQuestion");
+        resultBox.style.display = "block";
+        resultBox.textContent = "Processing image with Gemini Vision (" + mode.toUpperCase() + ")...";
+        try {
+            const resp = await fetch("/api/process-image", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    image_base64: selectedStaticDataUrl,
+                    mime_type: selectedStaticMime,
+                    mode: mode,
+                    question: questionInput.value.trim() || undefined
+                })
+            });
+            const data = await resp.json();
+            if (data.success) {
+                resultBox.textContent = data.result;
+            } else {
+                resultBox.textContent = "Error: " + data.error;
+            }
+        } catch (err) {
+            resultBox.textContent = "Request failed: " + err.message;
+        }
+    }
+
+    async function triggerImageGeneration() {
+        const promptInput = document.getElementById("genPrompt");
+        const prompt = promptInput.value.trim();
+        if (!prompt) {
+            alert("Please describe the image you want to generate.");
+            return;
+        }
+        const statusEl = document.getElementById("genStatusText");
+        const imgEl = document.getElementById("genResultImg");
+        statusEl.textContent = "Generating image for '" + prompt + "'...";
+        statusEl.style.display = "block";
+        imgEl.style.display = "none";
+        try {
+            const resp = await fetch("/api/generate-image", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt: prompt })
+            });
+            const data = await resp.json();
+            if (data.success && data.image_base64) {
+                imgEl.src = "data:" + data.mime_type + ";base64," + data.image_base64;
+                imgEl.style.display = "block";
+                statusEl.textContent = data.caption || ("Generated with " + data.model);
+            } else if (data.quota_exhausted) {
+                statusEl.innerHTML = "⚠️ <b>Free-Tier Quota Limit:</b> " + data.error + "<br><br><span style='color:#94a3b8;'>" + data.suggestion + "</span>";
+            } else {
+                statusEl.textContent = "Error: " + (data.error || "Failed to generate image.");
+            }
+        } catch (err) {
+            statusEl.textContent = "Request failed: " + err.message;
+        }
+    }
+    let currentSelectedSessionId = null;
+    let currentSelectedMessages = [];
+
+    async function loadHistorySessions() {
+        const container = document.getElementById("sessionListItems");
+        try {
+            const resp = await fetch("/api/conversations");
+            const data = await resp.json();
+            if (data.success && data.sessions && data.sessions.length > 0) {
+                container.innerHTML = "";
+                data.sessions.forEach(s => {
+                    const item = document.createElement("div");
+                    item.className = "session-item" + (s.id === currentSelectedSessionId ? " active" : "");
+                    const dateStr = s.created_at ? new Date(s.created_at).toLocaleString() : s.id;
+                    item.innerHTML = `
+                        <div class="session-item-title">${s.id.slice(0, 18)}...</div>
+                        <div class="session-item-meta">
+                            <span>${dateStr}</span>
+                            <span class="badge-tag">${s.message_count || 0} msgs</span>
+                        </div>
+                    `;
+                    item.onclick = () => selectHistorySession(s.id, dateStr, item);
+                    container.appendChild(item);
+                });
+                if (!currentSelectedSessionId && data.sessions[0]) {
+                    selectHistorySession(data.sessions[0].id, new Date(data.sessions[0].created_at).toLocaleString(), container.children[0]);
+                }
+            } else {
+                container.innerHTML = "<div class='empty-history'>No conversations stored yet. Start a voice chat!</div>";
+            }
+        } catch (err) {
+            container.innerHTML = "<div class='empty-history'>Error loading: " + err.message + "</div>";
+        }
+    }
+
+    async function selectHistorySession(sessionId, dateStr, itemEl) {
+        currentSelectedSessionId = sessionId;
+        document.querySelectorAll(".session-item").forEach(el => el.classList.remove("active"));
+        if (itemEl) itemEl.classList.add("active");
+
+        document.getElementById("detailTitle").textContent = "Conversation: " + sessionId;
+        document.getElementById("detailSubtitle").textContent = "Recorded on " + dateStr;
+        document.getElementById("exportBtnGroup").style.display = "flex";
+
+        const msgsContainer = document.getElementById("detailMessages");
+        const galleryEl = document.getElementById("sessionImagesGallery");
+        msgsContainer.innerHTML = "<div class='empty-history'>Loading messages from PostgreSQL...</div>";
+
+        try {
+            const resp = await fetch("/api/conversations/" + sessionId);
+            const data = await resp.json();
+            if (data.success) {
+                if (galleryEl) {
+                    if (data.images && data.images.length > 0) {
+                        galleryEl.style.display = "flex";
+                        let gHtml = '<div class="gallery-header"><span>📸 Captured Vision Frames (' + data.images.length + ')</span><span style="font-size:10.5px; opacity:0.75;">Click frame to inspect full size ↗</span></div><div class="gallery-strip">';
+                        data.images.forEach(img => {
+                            const sizeKb = (img.size_bytes / 1024).toFixed(0) + " KB";
+                            gHtml += '<div class="gallery-item" onclick="window.open(\'' + img.url + '\')" title="Click to open ' + img.filename + '"><img src="' + img.url + '" alt="' + img.filename + '"><span class="gallery-badge">' + sizeKb + '</span></div>';
+                        });
+                        gHtml += '</div>';
+                        galleryEl.innerHTML = gHtml;
+                    } else {
+                        galleryEl.style.display = "none";
+                        galleryEl.innerHTML = "";
+                    }
+                }
+            }
+            if (data.success && data.messages) {
+                currentSelectedMessages = data.messages;
+                msgsContainer.innerHTML = "";
+                if (data.messages.length === 0) {
+                    msgsContainer.innerHTML = "<div class='empty-history'>No messages recorded in this session.</div>";
+                    return;
+                }
+                data.messages.forEach(m => {
+                    const msgDiv = document.createElement("div");
+                    msgDiv.className = "message " + (m.role === "user" ? "user" : "gemini");
+                    const time = m.timestamp ? new Date(m.timestamp).toLocaleTimeString() : "";
+                    const prefix = m.role === "user" ? "You: " : "Gemini: ";
+                    let imgHtml = "";
+                    if (m.image_url) {
+                        imgHtml = `<img src="${m.image_url}" class="history-msg-img" onclick="window.open(this.src)" title="Click to open full high-resolution image" alt="Processed Vision Frame">`;
+                    }
+                    msgDiv.innerHTML = `<div><b>${prefix}</b>${m.content}</div>${imgHtml}<div style="font-size:10.5px; opacity:0.6; text-align:right; margin-top:4px;">${time}</div>`;
+                    msgsContainer.appendChild(msgDiv);
+                });
+                msgsContainer.scrollTop = msgsContainer.scrollHeight;
+            }
+        } catch (err) {
+            msgsContainer.innerHTML = "<div class='empty-history'>Error: " + err.message + "</div>";
+        }
+    }
+
+    function exportCurrentSession(format) {
+        if (!currentSelectedMessages || currentSelectedMessages.length === 0) {
+            alert("No messages to export!");
+            return;
+        }
+        let content = "";
+        let filename = "conversation_" + currentSelectedSessionId;
+        let mime = "text/plain";
+
+        if (format === "json") {
+            content = JSON.stringify(currentSelectedMessages, null, 2);
+            filename += ".json";
+            mime = "application/json";
+        } else {
+            content = "# Gemini Live Conversation: " + currentSelectedSessionId + "\n\n";
+            currentSelectedMessages.forEach(m => {
+                const time = m.timestamp ? new Date(m.timestamp).toLocaleTimeString() : "";
+                content += `### [${m.role.toUpperCase()}] (${time})\n${m.content}\n\n`;
+            });
+            filename += ".md";
+            mime = "text/markdown";
+        }
+
+        const blob = new Blob([content], { type: mime });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+    }
+
+</script>
 </body>
 </html>
